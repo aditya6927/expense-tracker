@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Summary Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Summary of Your Expenses</h2>
+
+    <h3>Total Expenses: ₹{{ total_expenses }}</h3>
+
+    <h4>Filter Expenses</h4>
+    <form method="GET">
+        <label for="category">Category:</label>
+        <input type="text" name="category" placeholder="Enter category"><br>
+        
+        <label for="date">Date:</label>
+        <input type="date" name="date"><br>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <h3>Your Expenses</h3>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Description</th>
+        </tr>
+        {% for expense in expenses %}
+        <tr>
+            <td>{{ expense.date }}</td>
+            <td>{{ expense.category }}</td>
+            <td>{{ expense.amount }}</td>
+            <td>{{ expense.description }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">No expenses found.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>
