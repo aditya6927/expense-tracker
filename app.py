@@ -168,7 +168,7 @@ def delete_expense(expense_id):
         conn.commit()
         flash("Expense deleted")
     conn.close()
-    return redirect(url_for('home'))
+    return redirect(url_for('summary'))
 
 @app.route('/edit/<int:expense_id>', methods = ['GET', 'POST'])
 def edit_expense(expense_id):
@@ -195,7 +195,7 @@ def edit_expense(expense_id):
                          (category, amount, description, expense_id, user['id']))
             conn.commit()
             flash("Expense added successfully.")
-            return redirect(url_for('home'))
+            return redirect(url_for('summary'))
         return render_template("edit_expense.html", expense = expense)
     conn.close()
     return redirect(url_for('login'))
@@ -215,23 +215,30 @@ def summary():
         #filter by category or date
         category_filter = request.args.get('category')
         date_filter = request.args.get('date')
+        month_filter = request.args.get('month')
         if(category_filter):
             expenses = [expense for expense in expenses if(expense['category'] == category_filter)]
         if(date_filter):
             expenses = [expense for expense in expenses if(expense['date'] == date_filter)]
+        if(month_filter):
+            month, year = month_filter.split('-')[1], month_filter.split('-')[0]
+            expenses = [
+                expense for expense in expenses
+                if expense['date'].split('-')[1] == month and expense['date'].split('-')[0] == year
+            ]
         return render_template("summary.html", expenses = expenses, total_expenses = total_expenses)
     conn.close()
     return redirect(url_for('login'))
 
 # to delete users.db and expenses.db
-# @app.route('/clear-data')
-# def clear_data():
-#     conn = get_db_connection()
-#     conn.execute("DELETE FROM expenses")
-#     conn.execute("DELETE FROM users")
-#     conn.commit()
-#     conn.close()
-#     return "All data deleted. You can now remove this route."
+@app.route('/clear-data')
+def clear_data():
+    conn = get_db_connection()
+    conn.execute("DELETE FROM expenses")
+    conn.execute("DELETE FROM users")
+    conn.commit()
+    conn.close()
+    return "All data deleted. You can now remove this route."
 
 if __name__ == '__main__':
     app.run(debug=True)
